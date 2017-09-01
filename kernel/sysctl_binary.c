@@ -1020,6 +1020,7 @@ static ssize_t bin_intvec(struct file *file,
 		size_t length = newlen / sizeof(*vec);
 		char *str, *end;
 		int i;
+		loff_t pos = 0;
 
 		str = buffer;
 		end = str + BUFSZ;
@@ -1033,7 +1034,7 @@ static ssize_t bin_intvec(struct file *file,
 			str += scnprintf(str, end - str, "%lu\t", value);
 		}
 
-		result = kernel_write(file, buffer, str - buffer, 0);
+		result = kernel_write(file, buffer, str - buffer, &pos);
 		if (result < 0)
 			goto out_kfree;
 	}
@@ -1092,6 +1093,7 @@ static ssize_t bin_ulongvec(struct file *file,
 		size_t length = newlen / sizeof(*vec);
 		char *str, *end;
 		int i;
+		loff_t pos = 0;
 
 		str = buffer;
 		end = str + BUFSZ;
@@ -1105,7 +1107,7 @@ static ssize_t bin_ulongvec(struct file *file,
 			str += scnprintf(str, end - str, "%lu\t", value);
 		}
 
-		result = kernel_write(file, buffer, str - buffer, 0);
+		result = kernel_write(file, buffer, str - buffer, &pos);
 		if (result < 0)
 			goto out_kfree;
 	}
@@ -1205,6 +1207,7 @@ static ssize_t bin_dn_node_address(struct file *file,
 		__le16 dnaddr;
 		char buf[15];
 		int len;
+		loff_t pos = 0;
 
 		result = -EINVAL;
 		if (newlen != sizeof(dnaddr))
@@ -1218,7 +1221,7 @@ static ssize_t bin_dn_node_address(struct file *file,
 				le16_to_cpu(dnaddr) >> 10,
 				le16_to_cpu(dnaddr) & 0x3ff);
 
-		result = kernel_write(file, buf, len, 0);
+		result = kernel_write(file, buf, len, &pos);
 		if (result < 0)
 			goto out;
 	}
