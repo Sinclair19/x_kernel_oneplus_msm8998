@@ -424,8 +424,8 @@ static ssize_t new_sync_read(struct file *filp, char __user *buf, size_t len, lo
 	return ret;
 }
 
-ssize_t kernel_write(struct file *file, const char *buf, size_t count,
-			    loff_t pos)
+ssize_t kernel_write(struct file *file, const void *buf, size_t count,
+			    loff_t *pos)
 {
 	mm_segment_t old_fs;
 	ssize_t res;
@@ -433,7 +433,7 @@ ssize_t kernel_write(struct file *file, const char *buf, size_t count,
 	old_fs = get_fs();
 	set_fs(get_ds());
 	/* The cast to a user pointer is valid due to the set_fs() */
-	res = vfs_write(file, (__force const char __user *)buf, count, &pos);
+	res = vfs_write(file, (__force const char __user *)buf, count, pos);
 	set_fs(old_fs);
 
 	return res;
@@ -479,21 +479,18 @@ ssize_t vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
 
 EXPORT_SYMBOL(vfs_read);
 
-int kernel_read(struct file *file, loff_t offset,
-		char *addr, unsigned long count)
+ssize_t kernel_read(struct file *file, void *buf, size_t count, loff_t *pos)
 {
 	mm_segment_t old_fs;
-	loff_t pos = offset;
-	int result;
+	ssize_t result;
 
 	old_fs = get_fs();
 	set_fs(get_ds());
 	/* The cast to a user pointer is valid due to the set_fs() */
-	result = vfs_read(file, (void __user *)addr, count, &pos);
+	result = vfs_read(file, (void __user *)buf, count, pos);
 	set_fs(old_fs);
 	return result;
 }
-
 EXPORT_SYMBOL(kernel_read);
 
 static ssize_t new_sync_write(struct file *filp, const char __user *buf, size_t len, loff_t *ppos)

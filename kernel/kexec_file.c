@@ -67,8 +67,8 @@ static int copy_file_from_fd(int fd, void **buf, unsigned long *buf_len)
 
 	pos = 0;
 	while (pos < stat.size) {
-		bytes = kernel_read(f.file, pos, (char *)(*buf) + pos,
-				    stat.size - pos);
+		bytes = kernel_read(f.file, (char *)(*buf) + pos,
+				    stat.size - pos, &pos);
 		if (bytes < 0) {
 			vfree(*buf);
 			ret = bytes;
