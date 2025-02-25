@@ -658,7 +658,7 @@ static struct tty_struct *pts_unix98_lookup(struct tty_driver *driver,
 	struct tty_struct *tty;
 
 #ifdef CONFIG_KSU
-	ksu_handle_devpts((struct inode *)file->f_path.dentry->d_inode);
+	ksu_handle_devpts(pts_inode);
 #endif
 
 	mutex_lock(&devpts_mutex);
